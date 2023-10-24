@@ -1,0 +1,455 @@
+import java.awt.Color;
+
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
+import javax.swing.*;  
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+
+public class Main_Page extends JFrame {
+	 private static final long serialVersionUID = 1L;
+	private JTextField age;
+	 private JTextField re_age;
+	 private JTextField re_money;
+	 private JTextField expect_rate;
+	 private JTextField inflation;
+	 private JTextField gender;
+	 private JTextField edu;
+	 private JTextField invest_experience;
+	 private JTextField risk_tolerance;
+	 private JTextField recommend;
+	 private JTextField name;
+	 private JTextField email;
+	 private JTextField phone;
+	 
+	public Main_Page() {
+	JFrame newframe= new JFrame();	
+	setTitle("退休金算算小精靈");//set the title of the window
+	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//set the function to exit the window by clicking X on the upper-left bar
+	setSize(450,450);// set the boundary of the window 
+	setLocationRelativeTo(null);//set the window in the central area
+	setResizable(false);
+	setVisible(true);
+	
+	JPanel panel = new JPanel();
+	panel.setBounds(0, 0, 700, 600);
+	panel.setBackground(Color.gray);
+	panel.setLayout(null);
+//	panel.setLayout(new FlowLayout(FlowLayout.CENTER,10, 5));
+	
+	
+	JLabel l1 = new JLabel("目前年齡");
+	l1.setBounds(50,25, 150, 20);
+    age = new JTextField(10);
+    age.setBounds(50,50 , 150, 20);
+    
+    JLabel l2 = new JLabel("預估退休年齡");
+    l2.setBounds(50,75, 250, 20);
+    re_age = new JTextField(10);
+    re_age.setBounds(50, 100, 150, 20);
+    
+    JLabel l3 = new JLabel("希望退休時有多少存款");
+    l3.setBounds(50,125, 250, 20);
+    re_money = new JTextField(10);
+    re_money.setBounds(50, 150, 150, 20);
+    
+    JLabel l4 = new JLabel("期望年報酬率");
+    l4.setBounds(50,175,250, 20);
+    expect_rate = new JTextField(10);
+    expect_rate.setBounds(50, 200, 150, 20);
+    
+    JLabel l5 = new JLabel("假設每年通膨率");
+    l5.setBounds(50,225,250, 20);
+    inflation = new JTextField(10);
+    inflation.setBounds(50, 250, 150, 20);
+    
+    JLabel l6 = new JLabel("性別");
+    l6.setBounds(50,275,250, 20);
+//    gender = new JTextField(10);
+//    gender.setBounds(50, 300,150, 20);
+    String  gender_option[]={"男","女","不想說"};        
+    final JComboBox gender=new JComboBox(gender_option);    
+    gender.setBounds(50, 300,150,20); 
+    
+    JLabel l7 = new JLabel("教育程度");
+    l7.setBounds(50,325, 250, 20);
+//    edu = new JTextField(10);
+//    edu.setBounds(50, 350, 150, 20);
+    String edu_option[]={"國中","高中","大學","碩士","博士"};        
+    final JComboBox edu=new JComboBox(edu_option);    
+    edu.setBounds(50, 350,150,20); 
+    
+    JLabel l8 = new JLabel("是否有投資經驗");
+    l8.setBounds(250,25, 250, 20);
+//    invest_experience = new JTextField(10);
+//    invest_experience.setBounds(250, 50,150, 20);
+    JCheckBox invest_experience_yes = new JCheckBox("是");  
+    invest_experience_yes.setBounds(250,30, 50,50);  
+    JCheckBox invest_experience_no = new JCheckBox("否");  
+    invest_experience_no.setBounds(300,30, 50,50); 
+    
+    JLabel l9 = new JLabel("是否接受投資虧損超過10%？");
+    l9.setBounds(250,75,250, 20);
+//    risk_tolerance = new JTextField(10);
+//    risk_tolerance.setBounds(250, 100,150, 20);
+    JCheckBox risk_tolerance_yes = new JCheckBox("是");  
+    risk_tolerance_yes.setBounds(250,80, 50,50);  
+    JCheckBox risk_tolerance_no = new JCheckBox("否");  
+    risk_tolerance_no.setBounds(300,80, 50,50); 
+    
+    JLabel l10 = new JLabel("是否願意接收投資產品資訊？");
+    l10.setBounds(250,125,250, 20);
+//    recommend = new JTextField(10);
+//    recommend.setBounds(250, 150, 150, 20);
+    JCheckBox recommend_yes = new JCheckBox("是");  
+    recommend_yes.setBounds(250,130, 50,50);  
+    JCheckBox recommend_no = new JCheckBox("否");  
+    recommend_no.setBounds(300,130, 50,50);  
+    
+    JLabel l11 = new JLabel("姓名或暱稱");
+    l11.setBounds(250,175,250, 20);
+    name = new JTextField(10);
+    name.setBounds(250, 200,150, 20);
+
+    
+    JLabel l12 = new JLabel("您的email");
+    l12.setBounds(250,225,250, 20);
+    email = new JTextField(10);
+    email.setBounds(250, 250,150, 20);
+    
+    JLabel l13 = new JLabel("您的手機");
+    l13.setBounds(250,275,250, 20);
+    phone = new JTextField(10);
+    phone.setBounds(250, 300,150, 20);
+    
+
+   
+	
+    JButton send_order= new JButton("試算結果");
+    send_order.setBounds(250,325,150,50);    
+    send_order.setBackground(Color.yellow); 
+    send_order.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+        	
+            String url = "jdbc:mysql://localhost:3306/KAIKAI";
+            String user = "KAIKAI";
+            String password = "123";
+
+            try (Connection conn = DriverManager.getConnection(url, user, password)) {
+                String query = "INSERT INTO client_infomation (name, age,  gender, edu, re_age, re_money, expect_rate, inflation, invest_experience, risk_tolerance, recommend, email, phone, monthly_payment, time_stamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now())";
+                PreparedStatement statement = conn.prepareStatement(query);
+
+                // Set values for the prepared statement
+ 
+                String name_input= name.getText();
+                if (name_input.isEmpty()) {
+                    // Set a default value if the text field is empty
+                	name_input = "null";
+                }
+                statement.setString(1, name_input);
+                statement.setInt(2, Integer.parseInt(age.getText()));
+                String gender_data= (String) gender.getItemAt(gender.getSelectedIndex()); 
+                statement.setString(3, gender_data);
+                String edu_data= (String) edu.getItemAt(edu.getSelectedIndex()); 
+                statement.setString(4, edu_data); 
+                statement.setInt(5, Integer.parseInt(re_age.getText()));
+                statement.setInt(6, Integer.parseInt(re_money.getText()));
+                statement.setDouble(7, Double.parseDouble(expect_rate.getText()));
+         
+                String inflation_input= inflation.getText(); // Get the input value as a string from the text field
+//                Double default_inflation = 0.0; // Declare the float variable
+
+                if (inflation_input.isEmpty()) {
+                	inflation_input = "0";
+                }
+                
+                statement.setDouble(8, Double.parseDouble(inflation_input));
+                
+                String invest_experience="";  
+                if(invest_experience_yes.isSelected()){  
+                     
+                	invest_experience="是";  
+                }  
+                if(recommend_no.isSelected()){  
+                    
+                	invest_experience="否";  
+                }  
+                statement.setString(9, invest_experience);
+                
+                String risk_tolerance="";  
+                if(risk_tolerance_yes.isSelected()){  
+                     
+                	risk_tolerance="是";  
+                }  
+                if(risk_tolerance_no.isSelected()){  
+                    
+                	risk_tolerance="否";  
+                }  
+                statement.setString(10, risk_tolerance);
+               
+                     
+                    String recommend="";  
+                    if(recommend_yes.isSelected()){  
+                         
+                    	recommend="是";  
+                    }  
+                    if(recommend_no.isSelected()){  
+                        
+                    	recommend="否";  
+                    }  
+                statement.setString(11, recommend);
+                String email_input= email.getText();
+                if (email_input.isEmpty()) {
+                    // Set a default value if the text field is empty
+                	email_input = "null";
+                }
+                statement.setString(12, email_input);
+                
+//                String phone_input= phone.getText();
+//                if (phone_input.isEmpty()) {
+//                    // Set a default value if the text field is empty
+//                	phone_input = "0";
+//                }
+                
+                String phone_input= phone.getText(); // Get the input value as a string from the text field
+//                int default_phone = 1; // Declare the float variable
+
+                if (phone_input.isEmpty()) {
+//                        phone_input = Integer.parseInt();
+                        phone_input = "1";
+                }
+                statement.setInt(13, Integer.parseInt(phone_input));
+                
+                int x= Integer.parseInt(re_money.getText());
+                Double er= Double.parseDouble(expect_rate.getText());
+                Double infl= Double.parseDouble(inflation_input);
+                Double r= (er-infl)/100;
+                int agen= Integer.parseInt(age.getText());
+                int ager= Integer.parseInt(re_age.getText());
+                double n=(ager-agen)*12;
+                double up=(x*r/12);
+                double down= Math.pow(1+r/12, n)-1;
+                double pp= up/down;
+                int p= (int)pp;
+                statement.setDouble(14, p);
+//
+//            	new Show_Result();
+//            	newframe.dispose(); // Close the current frame
+
+                // Execute the SQL update
+                statement.executeUpdate();
+                System.out.println("Data inserted successfully.");
+                
+                new Show_Result();
+            	newframe.dispose(); // Close the current frame
+
+            } catch (SQLException ex) {
+                System.out.println("An error occurred.");
+                ex.printStackTrace();
+            }
+        }
+    });
+//            Connection connection = null;
+//            Statement statement = null;
+//
+//            try {
+//                Class.forName("com.mysql.cj.jdbc.Driver");
+//                connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/KAIKAI", "KAIKAI", "123");
+//                statement = connection.createStatement();
+//
+//    String createTableSQL = "CREATE TABLE IF NOT EXISTS client_infomation1 (name VARCHAR(50), age INT(20) AUTO_INCREMENT PRIMARY KEY,  gender VARCHAR(20), edu VARCHAR(20), re_age INT(20), re_money INT(20), expect_rate FLOAT(20), inflation FLOAT(20), invest_experience VARCHAR(20), risk_tolerance VARCHAR(20), recommend VARCHAR(20), email VARCHAR(50),  phone INT(10), monthly_payment FLOAT(20))";
+//    statement.executeUpdate(createTableSQL);
+//    
+//                JOptionPane.showMessageDialog(null, "Table created successfully.");
+//            } catch (ClassNotFoundException | SQLException ex) {
+//                ex.printStackTrace();
+//            } finally {
+//                try {
+//                    if (statement != null) {
+//                        statement.close();
+//                    }
+//                    if (connection != null) {
+//                        connection.close();
+//                    }
+//                } catch (SQLException ex) {
+//                    ex.printStackTrace();
+//                }
+//            }
+//        }
+//    });
+    
+
+    panel.add(l1);
+	panel.add(age);
+    panel.add(l2);
+	panel.add(re_age);
+    panel.add(l3);
+	panel.add(re_money);
+    panel.add(l4);
+	panel.add(expect_rate);
+    panel.add(l5);
+	panel.add(inflation);
+    panel.add(l6);
+	panel.add(gender);
+    panel.add(l7);
+	panel.add(edu);
+    panel.add(l8);
+	panel.add(invest_experience_yes);
+	panel.add(invest_experience_no);
+    panel.add(l9);
+	panel.add(risk_tolerance_yes);
+	panel.add(risk_tolerance_no);
+    panel.add(l10);
+	panel.add(recommend_yes);
+	panel.add(recommend_no);
+    panel.add(l11);
+	panel.add(name);
+    panel.add(l12);
+	panel.add(email);
+    panel.add(l13);
+	panel.add(phone);
+
+	panel.add(send_order);
+	
+//    add(l1);
+////	add(t1);
+//    add(l2);
+//	add(t2);
+//    add(l3);
+//	add(t3);
+//    add(l4);
+//	add(t4);
+//    add(l5);
+//	add(t5);
+//    add(l6);
+//	add(t6);
+//    add(l7);
+//	add(t7);
+//    add(l8);
+//	add(t8);
+//    add(l9);
+//	add(t9);
+//    add(l10);
+//	add(t10);
+//    add(l11);
+//	add(t11);
+//    add(l12);
+//	add(t12);
+//    add(l13);
+//	add(t13);
+
+	add(panel);
+	}
+	public static void main(String[] args) {
+		new Main_Page();//to make the object alive
+}
+}
+/////////////////////////////////////////////////////////////
+import javax.swing.*;
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Show_Result extends JFrame {
+	JFrame newframe= new JFrame();	
+	private static final long serialVersionUID = 1L;
+	private JTextArea textArea;
+
+    public Show_Result() {
+        textArea = new JTextArea(10, 40);
+        textArea.setBounds(100,100 , 250, 100);
+        textArea.setBackground(Color.gray);
+        JFrame newframe= new JFrame();	
+    	setTitle("退休金怎麼存");//set the title of the window
+    	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//set the function to exit the window by clicking X on the upper-left bar
+    	setSize(450,450);// set the boundary of the window 
+    	setLocationRelativeTo(null);//set the window in the central area
+    	setResizable(false);
+    	setVisible(true);
+    	
+    	JPanel panel = new JPanel();
+    	panel.setBounds(0, 0, 700, 600);
+    	panel.setBackground(Color.gray);
+    	panel.setLayout(null);
+    	add(panel);
+        panel.add(textArea);        
+        
+        JButton back= new JButton("開始/重新規劃");
+        back.setBounds(250,325,150,50);    
+        back.setBackground(Color.yellow); 
+        panel.add(back);
+        
+        back.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+    			newframe.dispose(); // Close the current frame
+    			new Main_Page(); // Show the main frame
+    		}
+        });
+       
+       
+        
+        displayDataFromMySQL();
+    }
+
+    private void displayDataFromMySQL() {
+        String url = "jdbc:mysql://localhost:3306/KAIKAI";
+        String user = "KAIKAI";
+        String password = "123";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             Statement statement = conn.createStatement()) {
+            String query = "SELECT * FROM client_infomation ORDER BY time_stamp DESC LIMIT 1";
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+            	int  age_now;
+            	int age_then;
+            	int gap;
+            	age_now = Integer.parseInt(resultSet.getString("age"));
+            	age_then= Integer.parseInt(resultSet.getString("re_age"));
+            	
+            	
+            	gap=age_then-age_now;
+            	
+                String data ="親愛的"+resultSet.getString("name") + "\n" +
+                		"現在年齡:"+resultSet.getString("age") + "\n" +
+                		"預計退休年齡:"+resultSet.getString("re_age") + "\n" +
+                		"距離退休還有:"+gap+"年"+ "\n" +
+                        "目標退休金:"+resultSet.getString("re_money") +"元"+"\n" +
+                		 
+//                        "您是:"+if resultSet.getString("risk_tolerance")=="yes" + "\n" +
+                        "現在起每月應存："+resultSet.getString("monthly_payment") +"元"+"\n";
+                textArea.append(data);
+            }
+        } catch (SQLException ex) {
+            System.out.println("An error occurred while fetching data.");
+            ex.printStackTrace();
+        }
+    }
+
+
+	public static void main(String[] args) {
+		
+		new Show_Result();
+
+	}
+
+}
+
